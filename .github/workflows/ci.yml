@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - dev
 
 jobs:
   build:
@@ -41,9 +42,18 @@ jobs:
           name: build
           path: build
 
-      - name: Deploy to Firebase
+      - name: Deploy to Firebase (Production)
+        if: github.ref == 'refs/heads/master'
         uses: w9jds/firebase-action@master
         with:
-          args: deploy --only hosting
+          args: deploy --only hosting:production
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+
+      - name: Deploy to Firebase (Development)
+        if: github.ref == 'refs/heads/dev'
+        uses: w9jds/firebase-action@master
+        with:
+          args: deploy --only hosting:development
         env:
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
